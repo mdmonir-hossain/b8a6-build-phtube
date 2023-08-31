@@ -6,7 +6,7 @@ const handleCategoryVideos = async () => {
   const categoryContainer = document.getElementById("category-container");
   data.data.forEach((category) => {
     const div = document.createElement("div");
-    div.innerHTML = `<a onClick="handleLoadVideosBtn('${category.category_id}')" class="btn px-5 py-2 ">${category.category}</a> `;
+    div.innerHTML = `<a onClick="handleLoadVideosBtn('${category.category_id}')" class="btn btn-active px-5 py-2 ">${category.category}</a> `;
     categoryContainer.appendChild(div);
   });
 };
@@ -18,12 +18,23 @@ const handleLoadVideosBtn = async (id) => {
   const data = await res.json();
   const cardContainer = document.getElementById("card-container");
   cardContainer.innerHTML = "";
-  data.data.forEach(loadVideos => {
-    console.log(loadVideos);
+  if (data.data.length == 0)
+  {
+    cardContainer.innerHTML = `
+    <div class=" flex justify-center  mt-10">
+    <img class="w-40" src="./images/icon.png" />
+    </div>
+    <h1 class="text-3xl text-center font-bold">Oops!! Sorry, There is no <br> content here</h1>
+    `;
+    cardContainer.classList.remove('grid');
+  } else {
+    cardContainer.classList.add('grid');
+    }
+  data.data.forEach((loadVideos) => {
     const div = document.createElement("div");
 
     if (loadVideos.authors[0].verified === true) {
-        loadVideos.authors[0].verified = `
+      loadVideos.authors[0].verified = `
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
             <g clip-path="url(#clip0_11_245)">
               <path d="M19.375 10.0001C19.375 10.8001 18.3922 11.4595 18.1953 12.197C17.9922 12.9595 18.5063 14.022 18.1203 14.6892C17.7281 15.3673 16.5484 15.4486 15.9984 15.9986C15.4484 16.5486 15.3672 17.7282 14.6891 18.1204C14.0219 18.5064 12.9594 17.9923 12.1969 18.1954C11.4594 18.3923 10.8 19.3751 10 19.3751C9.2 19.3751 8.54062 18.3923 7.80312 18.1954C7.04062 17.9923 5.97813 18.5064 5.31094 18.1204C4.63281 17.7282 4.55156 16.5486 4.00156 15.9986C3.45156 15.4486 2.27187 15.3673 1.87969 14.6892C1.49375 14.022 2.00781 12.9595 1.80469 12.197C1.60781 11.4595 0.625 10.8001 0.625 10.0001C0.625 9.20012 1.60781 8.54075 1.80469 7.80325C2.00781 7.04075 1.49375 5.97825 1.87969 5.31106C2.27187 4.63293 3.45156 4.55168 4.00156 4.00168C4.55156 3.45168 4.63281 2.272 5.31094 1.87981C5.97813 1.49387 7.04062 2.00793 7.80312 1.80481C8.54062 1.60793 9.2 0.625122 10 0.625122C10.8 0.625122 11.4594 1.60793 12.1969 1.80481C12.9594 2.00793 14.0219 1.49387 14.6891 1.87981C15.3672 2.272 15.4484 3.45168 15.9984 4.00168C16.5484 4.55168 17.7281 4.63293 18.1203 5.31106C18.5063 5.97825 17.9922 7.04075 18.1953 7.80325C18.3922 8.54075 19.375 9.20012 19.375 10.0001Z" fill="#2568EF"/>
@@ -38,24 +49,45 @@ const handleLoadVideosBtn = async (id) => {
           `;
     } else {
       loadVideos.authors[0].verified = "";
-      }
-      
-      const convert = loadVideos.others.posted_date / 60;
-      console.log(convert/60);
+    }
+
+    const totalMinutes = Math.floor(loadVideos.others.posted_date / 60);
+    const hours = Math.floor(totalMinutes / 60);
+    const min = totalMinutes % 60;
+    const hiddenid = document.getElementById("hidden-id");
+    const hrs = "Hrs";
+    const minutes = "min ago";
+
+    //   if (loadVideos.others.posted_date !== "") {
+    //       hiddenid.classList.remove(hidden);
+    //   } else {
+    //     hiddenid.classList.add(hidden);
+    //   }
+
     div.innerHTML = ` 
         <div class="card  bg-base-100  ">
-                <figure><img class="rounded-md w-full h-48 relative" src="${loadVideos.thumbnail}" /></figure>
-                <span class="bg-black text-white absolute left-[216px]  bottom-[190px] ">${loadVideos?.others?.posted_date}</span>
+                <figure><img class="rounded-md w-full h-48 relative" src="${
+                  loadVideos.thumbnail
+                }" /></figure>
+                <span  class="bg-black p-2  text-white absolute left-[160px]  bottom-[180px] ">${
+                  hours > 0 ? hours + " hrs" : ""
+                }   ${min > 0 ? min + " min ago" : ""} </span>
                 <div class="card-body">
                 <div class="flex gap-2">
-                  <img class="rounded-full w-10 h-10  " src="${loadVideos?.authors[0]?.profile_picture}" />
-                  <h2 class="text-xl">${loadVideos.title}</h2>
+                  <img class="rounded-full w-10 h-10   " src="${
+                    loadVideos?.authors[0]?.profile_picture
+                  }" />
+                  <h2 class="text-xl font-bold">${loadVideos.title}</h2>
                   </div>
                   <div class="flex gap-2">
-                  <span class=" text-sm ml-10">${loadVideos?.authors[0]?.profile_name}</span>
+                  <span class=" text-sm ml-10">${
+                    loadVideos?.authors[0]?.profile_name
+                  }</span>
                   <span>${loadVideos?.authors[0]?.verified}</span>
                   </div>
-                <h2>${loadVideos?.others?.views} Views</h2>
+                <h2 class=" text-sm ml-10">${
+                  loadVideos?.others?.views
+                } Views</h2>
                 </div>
               </div>
         `;
