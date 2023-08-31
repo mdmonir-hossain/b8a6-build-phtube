@@ -18,18 +18,17 @@ const handleLoadVideosBtn = async (id) => {
   const data = await res.json();
   const cardContainer = document.getElementById("card-container");
   cardContainer.innerHTML = "";
-  if (data.data.length == 0)
-  {
+  if (data.data.length == 0) {
     cardContainer.innerHTML = `
     <div class=" flex justify-center  mt-10">
     <img class="w-40" src="./images/icon.png" />
     </div>
     <h1 class="text-3xl text-center font-bold">Oops!! Sorry, There is no <br> content here</h1>
     `;
-    cardContainer.classList.remove('grid');
+    cardContainer.classList.remove("grid");
   } else {
-    cardContainer.classList.add('grid');
-    }
+    cardContainer.classList.add("grid");
+  }
   data.data.forEach((loadVideos) => {
     const div = document.createElement("div");
 
@@ -54,43 +53,43 @@ const handleLoadVideosBtn = async (id) => {
     const totalMinutes = Math.floor(loadVideos.others.posted_date / 60);
     const hours = Math.floor(totalMinutes / 60);
     const min = totalMinutes % 60;
-    const hiddenid = document.getElementById("hidden-id");
-    const hrs = "Hrs";
-    const minutes = "min ago";
 
-    //   if (loadVideos.others.posted_date !== "") {
-    //       hiddenid.classList.remove(hidden);
-    //   } else {
-    //     hiddenid.classList.add(hidden);
-    //   }
-
-    div.innerHTML = ` 
+    if (loadVideos.others.posted_date !== "") {
+      div.innerHTML = ` 
         <div class="card  bg-base-100  ">
-                <figure><img class="rounded-md w-full h-48 relative" src="${
-                  loadVideos.thumbnail
-                }" /></figure>
-                <span  class="bg-black p-2  text-white absolute left-[160px]  bottom-[180px] ">${
-                  hours > 0 ? hours + " hrs" : ""
-                }   ${min > 0 ? min + " min ago" : ""} </span>
+                <figure><img class="rounded-md w-full h-48 relative" src="${loadVideos.thumbnail}" /></figure>
+                <span  class="bg-black p-2  text-white absolute left-[160px]  bottom-[180px] ">${hours} hrs   ${min} min ago </span>
                 <div class="card-body">
                 <div class="flex gap-2">
-                  <img class="rounded-full w-10 h-10   " src="${
-                    loadVideos?.authors[0]?.profile_picture
-                  }" />
+                  <img class="rounded-full w-10 h-10   " src="${loadVideos?.authors[0]?.profile_picture}" />
                   <h2 class="text-xl font-bold">${loadVideos.title}</h2>
                   </div>
                   <div class="flex gap-2">
-                  <span class=" text-sm ml-10">${
-                    loadVideos?.authors[0]?.profile_name
-                  }</span>
+                  <span class=" text-sm ml-10">${loadVideos?.authors[0]?.profile_name}</span>
                   <span>${loadVideos?.authors[0]?.verified}</span>
                   </div>
-                <h2 class=" text-sm ml-10">${
-                  loadVideos?.others?.views
-                } Views</h2>
+                <h2 class=" text-sm ml-10">${loadVideos?.others?.views} Views</h2>
                 </div>
               </div>
         `;
+    } else {
+      div.innerHTML = ` 
+        <div class="card  bg-base-100  ">
+                <figure><img class="rounded-md w-full h-48 relative" src="${loadVideos.thumbnail}" /></figure>
+                <div class="card-body">
+                <div class="flex gap-2">
+                  <img class="rounded-full w-10 h-10   " src="${loadVideos?.authors[0]?.profile_picture}" />
+                  <h2 class="text-xl font-bold">${loadVideos.title}</h2>
+                  </div>
+                  <div class="flex gap-2">
+                  <span class=" text-sm ml-10">${loadVideos?.authors[0]?.profile_name}</span>
+                  <span>${loadVideos?.authors[0]?.verified}</span>
+                  </div>
+                <h2 class=" text-sm ml-10">${loadVideos?.others?.views} Views</h2>
+                </div>
+              </div>
+        `;
+    }
     cardContainer.appendChild(div);
   });
 };
