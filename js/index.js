@@ -4,9 +4,10 @@ const handleCategoryVideos = async () => {
   );
   const data = await res.json();
   const categoryContainer = document.getElementById("category-container");
+
   data.data.forEach((category) => {
     const div = document.createElement("div");
-    div.innerHTML = `<a onClick="handleLoadVideosBtn('${category.category_id}')" class="btn btn-active px-5 py-2 ">${category.category}</a> `;
+    div.innerHTML = `<a id="btn-bg-id" onClick="handleLoadVideosBtn('${category.category_id}'); btnBgColor(this);"  class="btn  px-5   py-2 ">${category.category} </a> `;
     categoryContainer.appendChild(div);
   });
 };
@@ -18,6 +19,7 @@ const handleLoadVideosBtn = async (id) => {
   const data = await res.json();
   const cardContainer = document.getElementById("card-container");
   cardContainer.innerHTML = "";
+
   if (data.data.length == 0) {
     cardContainer.innerHTML = `
     <div class=" flex justify-center  mt-10">
@@ -29,9 +31,14 @@ const handleLoadVideosBtn = async (id) => {
   } else {
     cardContainer.classList.add("grid");
   }
+  const viewsarr = [];
   data.data.forEach((loadVideos) => {
-    const div = document.createElement("div");
+    const viewsCount = loadVideos.others.views.split("K")[0] * 1000;
+    const views = parseFloat(viewsCount);
+    viewsarr.push(views);
+    viewsarr.sort((a, b) => b - a);
 
+    // console.log(viewsarr);
     if (loadVideos.authors[0].verified === true) {
       loadVideos.authors[0].verified = `
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -53,6 +60,8 @@ const handleLoadVideosBtn = async (id) => {
     const totalMinutes = Math.floor(loadVideos.others.posted_date / 60);
     const hours = Math.floor(totalMinutes / 60);
     const min = totalMinutes % 60;
+
+    const div = document.createElement("div");
 
     if (loadVideos.others.posted_date !== "") {
       div.innerHTML = ` 
@@ -93,6 +102,23 @@ const handleLoadVideosBtn = async (id) => {
     cardContainer.appendChild(div);
   });
 };
+// Button bg Color 
 
+const btnBgColor = (btn) => {
+  const allBtn = document.querySelectorAll('#btn-bg-id');
+  allBtn.forEach(btnData => {
+    btnData.classList.remove("bg-red-600");
+  })
+ 
+  if (btn.classList.contains("bg-red-600")=== false) {
+    btn.classList.add("bg-red-600");
+  } else {
+    btn.classList.remove("bg-red-600");
+  }
+  
+};
+
+// Call Functoin 
 handleLoadVideosBtn("1000");
 handleCategoryVideos();
+
