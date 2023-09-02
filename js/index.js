@@ -1,16 +1,26 @@
+// Fetch category from API
 const handleCategoryVideos = async () => {
   const res = await fetch(
     "https://openapi.programming-hero.com/api/videos/categories"
   );
   const data = await res.json();
+
   const categoryContainer = document.getElementById("category-container");
 
-  data.data.forEach((category) => {
+  data.data.map((category) => {
     const div = document.createElement("div");
-    div.innerHTML = `<a id="btn-bg-id" onClick="handleLoadVideosBtn('${category.category_id}'); btnBgColor(this);"  class="btn  px-5   py-2 ">${category.category} </a> `;
+    div.innerHTML = `<a id="btn-bg-id" onClick="handleLoadVideosBtn('${category.category_id}'); btnBgColor(this); handlesortBtn('${category.category_id}');"  class="btn  px-5   py-2 ">${category.category} </a> `;
     categoryContainer.appendChild(div);
+    const categoryId = category.category_id;
+    // default bg color
+    if (category.category_id === "1000") {
+      document.getElementById("btn-bg-id").classList.add("bg-red-600");
+      document.getElementById("btn-bg-id").style.color = "white";
+    }
   });
 };
+
+// Load Videos Card
 
 const handleLoadVideosBtn = async (id) => {
   const res = await fetch(
@@ -20,6 +30,7 @@ const handleLoadVideosBtn = async (id) => {
   const cardContainer = document.getElementById("card-container");
   cardContainer.innerHTML = "";
 
+  // No data Found Condition
   if (data.data.length == 0) {
     cardContainer.innerHTML = `
     <div class=" flex justify-center  mt-10">
@@ -31,14 +42,10 @@ const handleLoadVideosBtn = async (id) => {
   } else {
     cardContainer.classList.add("grid");
   }
-  const viewsarr = [];
+  
   data.data.forEach((loadVideos) => {
-    const viewsCount = loadVideos.others.views.split("K")[0] * 1000;
-    const views = parseFloat(viewsCount);
-    viewsarr.push(views);
-    viewsarr.sort((a, b) => b - a);
-
-    // console.log(viewsarr);
+  
+    // verified Condition
     if (loadVideos.authors[0].verified === true) {
       loadVideos.authors[0].verified = `
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -56,13 +63,15 @@ const handleLoadVideosBtn = async (id) => {
     } else {
       loadVideos.authors[0].verified = "";
     }
-
+    // Sec to hrs and min convert
     const totalMinutes = Math.floor(loadVideos.others.posted_date / 60);
     const hours = Math.floor(totalMinutes / 60);
     const min = totalMinutes % 60;
 
+    // appened Card
     const div = document.createElement("div");
 
+    // posted date Blank Condition
     if (loadVideos.others.posted_date !== "") {
       div.innerHTML = ` 
         <div class="card  bg-base-100  ">
@@ -102,23 +111,49 @@ const handleLoadVideosBtn = async (id) => {
     cardContainer.appendChild(div);
   });
 };
-// Button bg Color 
-
+// Button bg Color
 const btnBgColor = (btn) => {
-  const allBtn = document.querySelectorAll('#btn-bg-id');
-  allBtn.forEach(btnData => {
+  const allBtn = document.querySelectorAll("#btn-bg-id");
+  allBtn.forEach((btnData) => {
     btnData.classList.remove("bg-red-600");
-  })
- 
-  if (btn.classList.contains("bg-red-600")=== false) {
+    btnData.style.color = "black";
+  });
+
+  if (btn.classList.contains("bg-red-600") === false) {
     btn.classList.add("bg-red-600");
+    btn.style.color = "white";
   } else {
     btn.classList.remove("bg-red-600");
+    btn.style.color = "black";
   }
+};
+
+// Sort Button
+
+const sortBtnId = document.getElementById("sort-Btn-Id");
+sortBtnId.addEventListener("click", function () {
+  handlesortBtn();
+});
+
+const handlesortBtn = async (id) => {
+  console.log(id);
+  const res = await fetch(
+    `https://openapi.programming-hero.com/api/videos/category/${id}`
+  );
+  const data = await res.json();
+  let sortArr = [];
+  data.data.forEach(sortData => {
+    const views = parseFloat(sortData.others.views);
+  const viewsCount = views * 1000;
+  sortArr.push(viewsCount);
+  sortArr.sort(
+    (a, b) => b - a
+  );
+  console.log(sortArr);
+  });
   
 };
 
-// Call Functoin 
+// Call Function
 handleLoadVideosBtn("1000");
 handleCategoryVideos();
-
